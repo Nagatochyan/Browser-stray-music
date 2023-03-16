@@ -1,39 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MP3 Player</title>
+  <title>Stray Music</title>
   <meta charset="utf-8">
 </head>
 <body>
+  <h1>Stray Music(browser beta)</h1>
   <input type="file" id="fileInput" multiple accept="audio/mp3">
   <button onclick="playSequentially()">Sequential Play</button>
   <button onclick="playRandomly()">Random Play</button>
+  <button onclick="pauseAudio()">Pause</button>
+  <button onclick="resumeAudio()">Resume</button>
+  <select id="audioSelect" onchange="changeAudio()">
+  </select>
   <script>
     var audioList = [];
     var currentIndex = 0;
+    var currentAudio;
+    var isPaused = false;
     
     function playSequentially() {
       if (audioList.length > 0) {
-        var audio = audioList[currentIndex];
-        audio.addEventListener('ended', function() {
+        currentAudio = audioList[currentIndex];
+        currentAudio.addEventListener('ended', function() {
           currentIndex++;
           if (currentIndex >= audioList.length) {
             currentIndex = 0;
           }
           playSequentially();
         });
-        audio.play();
+        currentAudio.play();
+        isPaused = false;
       }
     }
     
     function playRandomly() {
       if (audioList.length > 0) {
         var randomIndex = Math.floor(Math.random() * audioList.length);
-        var audio = audioList[randomIndex];
-        audio.addEventListener('ended', function() {
+        currentAudio = audioList[randomIndex];
+        currentAudio.addEventListener('ended', function() {
           playRandomly();
         });
-        audio.play();
+        currentAudio.play();
+        isPaused = false;
+      }
+    }
+    
+    function pauseAudio() {
+      if (currentAudio && !isPaused) {
+        currentAudio.pause();
+        isPaused = true;
+      }
+    }
+    
+    function resumeAudio() {
+      if (currentAudio && isPaused) {
+        currentAudio.play();
+        isPaused = false;
+      }
+    }
+    
+    function changeAudio() {
+      if (audioList.length > 0) {
+        currentIndex = document.getElementById("audioSelect").value;
+        currentAudio = audioList[currentIndex];
+        currentAudio.play();
+        isPaused = false;
       }
     }
     
@@ -45,9 +77,15 @@
         var file = files[i];
         var audio = new Audio(URL.createObjectURL(file));
         audioList.push(audio);
+        var option = document.createElement("option");
+        option.text = file.name;
+        option.value = i;
+        document.getElementById("audioSelect").add(option);
       }
     });
   </script>
 </body>
 </html>
+
+
 
