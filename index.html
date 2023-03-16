@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stray Music/title>
+  <meta charset="utf-8">
+</head>
+<body>
+  <input type="file" id="fileInput" multiple accept="audio/mp3">
+  <button onclick="playSequentially()">Sequential Play</button>
+  <button onclick="playRandomly()">Random Play</button>
+  <script>
+    var audioList = [];
+    var currentIndex = 0;
+    
+    function playSequentially() {
+      if (audioList.length > 0) {
+        var audio = audioList[currentIndex];
+        audio.addEventListener('ended', function() {
+          currentIndex++;
+          if (currentIndex >= audioList.length) {
+            currentIndex = 0;
+          }
+          playSequentially();
+        });
+        audio.play();
+      }
+    }
+    
+    function playRandomly() {
+      if (audioList.length > 0) {
+        var randomIndex = Math.floor(Math.random() * audioList.length);
+        var audio = audioList[randomIndex];
+        audio.addEventListener('ended', function() {
+          playRandomly();
+        });
+        audio.play();
+      }
+    }
+    
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      audioList = [];
+      currentIndex = 0;
+      var files = e.target.files;
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var audio = new Audio(URL.createObjectURL(file));
+        audioList.push(audio);
+      }
+    });
+  </script>
+</body>
+</html>
